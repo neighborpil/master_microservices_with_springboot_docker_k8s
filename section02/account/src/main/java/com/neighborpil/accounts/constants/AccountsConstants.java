@@ -1,6 +1,6 @@
 package com.neighborpil.accounts.constants;
 
-public class AccountConstants {
+public class AccountsConstants {
 
     public static final String SAVINGS = "Savings";
     public static final String ADDRESS = "123 Main Street, New York";
@@ -11,7 +11,8 @@ public class AccountConstants {
     public static final String STATUS_417 = "417";
     public static final String MESSAGE_417_UPDATE = "Update operation failed. Please try again or contact Dev team";
     public static final String MESSAGE_417_DELETE = "Delete operation failed. Please try again or contact Dev team";
-    private AccountConstants() {
+
+    private AccountsConstants() {
     }
     // public static final String  STATUS_500 = "500";
     // public static final String  MESSAGE_500 = "An error occurred. Please try again or contact Dev team";
