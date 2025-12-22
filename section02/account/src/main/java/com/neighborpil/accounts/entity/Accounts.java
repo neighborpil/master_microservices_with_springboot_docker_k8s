@@ -3,7 +3,6 @@ package com.neighborpil.accounts.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
 
 @Getter
@@ -12,8 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "account")
-public class Account extends BaseEntity {
+public class Accounts extends BaseEntity {
 
     @Column(name = "customer_id")
     private Long customerId;
