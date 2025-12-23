@@ -9,9 +9,9 @@ import com.neighborpil.accounts.exception.CustomerAlreadyExistsException;
 import com.neighborpil.accounts.exception.ResourceNotFoundException;
 import com.neighborpil.accounts.mapper.AccountsMapper;
 import com.neighborpil.accounts.mapper.CustomerMapper;
-import com.neighborpil.accounts.repository.AccountRepository;
+import com.neighborpil.accounts.repository.AccountsRepository;
 import com.neighborpil.accounts.repository.CustomerRepository;
-import com.neighborpil.accounts.service.IAccountService;
+import com.neighborpil.accounts.service.IAccountsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +21,9 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
-public class AccountServiceImpl implements IAccountService {
+public class AccountsServiceImpl implements IAccountsService {
 
-    private final AccountRepository accountRepository;
+    private final AccountsRepository accountsRepository;
     private final CustomerRepository customerRepository;
 
     /**
@@ -41,7 +41,7 @@ public class AccountServiceImpl implements IAccountService {
         customer.setCreatedAt(LocalDateTime.now());
         customer.setCreatedBy("Anonymous");
         Customer savedCustomer = customerRepository.save(customer);
-        accountRepository.save(createNewAccount(savedCustomer));
+        accountsRepository.save(createNewAccount(savedCustomer));
     }
 
     /**
@@ -66,11 +66,51 @@ public class AccountServiceImpl implements IAccountService {
         Customer customer = customerRepository.findByMobileNumber(mobileNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber));
 
-        Accounts accounts = accountRepository.findByCustomerId(customer.getCustomerId())
+        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Accounts", "customerId", customer.getCustomerId().toString()));
 
         CustomerDto customerDto = CustomerMapper.mapToCustomerDto(customer, new CustomerDto());
         customerDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts, new AccountsDto()));
         return customerDto;
+    }
+
+    /**
+     * @param customerDto - CustomerDto Object
+     * @return boolean indicating if the update of Account details is successful or not
+     */
+    @Override
+    public boolean updateAccount(CustomerDto customerDto) {
+        boolean isUpdated = false;
+        AccountsDto accountsDto = customerDto.getAccountsDto();
+        if (accountsDto != null) {
+            Accounts accounts = accountsRepository.findById(accountsDto.getAccountNumber()).orElseThrow(
+                    () -> new ResourceNotFoundException("Account", "AccountNumber", accountsDto.getAccountNumber().toString())
+            );
+            AccountsMapper.mapToAccounts(accountsDto, accounts);
+            accounts = accountsRepository.save(accounts);
+
+            Long customerId = accounts.getCustomerId();
+            Customer customer = customerRepository.findById(customerId).orElseThrow(
+                    () -> new ResourceNotFoundException("Customer", "CustomerID", customerId.toString())
+            );
+            CustomerMapper.mapToCustomer(customerDto, customer);
+            customerRepository.save(customer);
+            isUpdated = true;
+        }
+        return isUpdated;
+    }
+
+    /**
+     * @param mobileNumber - Input Mobile Number
+     * @return boolean indicating if the delete of Account details is successful or not
+     */
+    @Override
+    public boolean deleteAccount(String mobileNumber) {
+        Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
+        );
+        accountsRepository.deleteByCustomerId(customer.getCustomerId());
+        customerRepository.deleteById(customer.getCustomerId());
+        return true;
     }
 }

@@ -2,7 +2,7 @@ package com.neighborpil.accounts.service;
 
 import com.neighborpil.accounts.dto.CustomerDto;
 
-public interface IAccountService {
+public interface IAccountsService {
 
     /**
      * Create account
@@ -12,4 +12,8 @@ public interface IAccountService {
     void createAccount(CustomerDto customerDto);
 
     CustomerDto fetchAccount(String mobileNumber);
+
+    boolean updateAccount(CustomerDto customerDto);
+
+    boolean deleteAccount(String mobileNumber);
 }
